@@ -3,15 +3,20 @@ import { CreateCustomerDto } from '../dto/create-customer.dto';
 import { ICustomerRepository } from '../domain/customer.repository';
 
 @Injectable()
-export class CreateCustomerUsecase {
+export class CreateCustomerUseCase {
   constructor(private readonly customerRepository: ICustomerRepository) {}
 
   async execute(createCustomerDto: CreateCustomerDto) {
-    const { email } = createCustomerDto;
-    const existingCustomer = await this.customerRepository.findByEmail(email);
+    const { email, document } = createCustomerDto;
 
-    if (existingCustomer) {
+    const existingEmail = await this.customerRepository.findByEmail(email);
+    if (existingEmail) {
       throw new BadRequestException('Email already in use');
+    }
+
+    const existingDocument = await this.customerRepository.findByDocument(document);
+    if (existingDocument) {
+      throw new BadRequestException('Document already in use');
     }
 
     return this.customerRepository.create(createCustomerDto);
