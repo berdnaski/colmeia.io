@@ -8,7 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model Customer {
   id String @id @default(uuid())
   name String
@@ -17,4 +16,38 @@ model Customer {
   phone String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  charges Charge[] @relation("CustomerCharges")
+  
+  @@map("customers") 
+}
+
+model Charge {
+  id String @id @default(uuid())
+  customerId String
+  customer Customer @relation(fields: [customerId], references: [id], name: "CustomerCharges", onDelete: Cascade)
+  amount Decimal
+  currency String @default("BRL")
+  paymentMethod PaymentMethod
+  status ChargeStatus @default(PENDING)
+  installments Int?
+  dueDate DateTime?
+  transactionId String? @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("charges") 
+}
+
+enum PaymentMethod {
+  BOLETO
+  CREDIT_CARD
+  PIX
+}
+
+enum ChargeStatus {
+  PENDING
+  PAID
+  FAILED
+  EXPIRED
 }
