@@ -4,6 +4,16 @@ import { PrismaService } from 'src/shared/infra/prisma/prisma.service';
 import { ICustomerRepository } from '../domain/customer.repository';
 import { CreateCustomerDto } from '../dto/create-customer.dto';
 
+interface PrismaCustomerRecord {
+  id: string;
+  name: string;
+  email: string;
+  document: string;
+  phone?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 @Injectable()
 export class PrismaCustomerRepository implements ICustomerRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -18,7 +28,7 @@ export class PrismaCustomerRepository implements ICustomerRepository {
       },
     });
 
-    return this.toDomain(created);
+    return this.toDomain(created as PrismaCustomerRecord);
   }
 
   async findByEmail(email: string): Promise<Customer | null> {
@@ -27,6 +37,20 @@ export class PrismaCustomerRepository implements ICustomerRepository {
     });
 
     if (!data) return null;
+    return this.toDomain(data);
+  }
+
+  async findAll(): Promise<Customer[]> {
+    const data = await this.prisma.customer.findMany();
+
+    return data.map((data) => this.toDomain(data as PrismaCustomerRecord))
+  }
+
+  async findById(id: string): Promise<Customer | null> {
+    const data = await this.prisma.customer.findUnique({
+      where: { id },
+    });
+
     return this.toDomain(data);
   }
 
