@@ -1,98 +1,255 @@
+# 🐝 Colmeia.io - Sistema de Pagamentos
+
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white" alt="NestJS" />
+  <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white" alt="Prisma" />
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Uma API RESTful robusta para sistema de pagamentos simplificado, desenvolvida com NestJS e TypeScript. Suporta cadastro de clientes e criação de cobranças com três métodos de pagamento: **PIX**, **Cartão de Crédito** e **Boleto Bancário**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+## 🚀 Funcionalidades
+
+### ✅ Implementadas
+- 👥 **Cadastro de Clientes** - CRUD completo com validações
+- 💳 **Gestão de Cobranças** - Criação e acompanhamento de pagamentos
+- 🔄 **Idempotência** - Controle via `transactionId`
+- 📊 **Três Métodos de Pagamento**:
+  - 🏦 **Boleto** - Com data de vencimento
+  - 💳 **Cartão de Crédito** - Com parcelamento (1-12x)
+  - ⚡ **PIX** - Processamento instantâneo
+- 📝 **Documentação Swagger (Scalar)** - Interface interativa da API
+- 🛡️ **Validações Robustas** - Class-validator e DTOs
+- 🗄️ **Banco Relacional** - PostgreSQL com Prisma ORM
+
+## ⚙️ Regras de Negócio Importantes
+
+- Uma cobrança **não pode ser atualizada** se estiver com status `EXPIRED`.
+- Uma cobrança que já foi **paga (`PAID`)** não pode voltar a outro status (ex: `FAILED`, `PENDING`).
+- Cobranças com status `PENDING` expiram automaticamente após o vencimento (`dueDate`).
+
+## 🛠️ Tecnologias
+
+- **Framework**: NestJS 11.x
+- **Linguagem**: TypeScript 5.x
+- **Banco de Dados**: PostgreSQL
+- **ORM**: Prisma 6.x
+- **Documentação**: Swagger/OpenAPI
+- **Validação**: Class-validator
+- **Arquitetura**: Clean Architecture
+
+## 📋 Pré-requisitos
+
+- Node.js 18+ 
+- PostgreSQL 12+
+- npm ou yarn
+- Docker + Docker Compose
+
+## ⚙️ Configuração do Ambiente
+
+### 1. Clone o repositório
+```bash
+git clone https://github.com/berdnaski/colmeia.io.git
+cd colmeia.io
+```
+
+### 2. Instale as dependências
+```bash
+npm install
+```
+
+### 3. Configure o banco de dados com Docker Compose
+```yaml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: colmeia_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: colmeia.io_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+```
+
+### 4. Configure o arquivo `.env`
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/colmeia.io_db?schema=public"
+PORT=3000
+```
+
+### 5. Execute as migrações
+```bash
+npx prisma migrate dev
+npx prisma generate
+```
+
+### 6. Inicie o servidor
+```bash
+# Desenvolvimento
+npm run start:dev
+
+# Produção
+npm run build
+npm run start:prod
+```
+
+## 📖 Documentação da API
+
+Após iniciar o servidor, acesse:
+- **Swagger UI**: http://localhost:3000/docs
+- **Scalar Docs**: http://localhost:3000/scalar
+
+## 🧪 Exemplos de Uso
+
+### 1. Criar Cliente
+```bash
+POST /customers
+Content-Type: application/json
+
+{
+  "name": "João Silva",
+  "email": "joao@exemplo.com",
+  "document": "12345678901",
+  "phone": "+5511999999999"
+}
+```
+
+### 2. Criar Cobrança - Boleto
+```bash
+POST /charges/{customerId}/charges
+Content-Type: application/json
+
+{
+  "amount": 150.00,
+  "currency": "BRL",
+  "paymentMethod": "BOLETO",
+  "dueDate": "2024-12-31T23:59:59Z",
+  "transactionId": "boleto_123456"
+}
+```
+
+### 3. Criar Cobrança - Cartão de Crédito
+```bash
+POST /charges/{customerId}/charges
+Content-Type: application/json
+
+{
+  "amount": 299.90,
+  "currency": "BRL",
+  "paymentMethod": "CREDIT_CARD",
+  "installments": 3,
+  "transactionId": "card_789012"
+}
+```
+
+### 4. Criar Cobrança - PIX
+```bash
+POST /charges/{customerId}/charges
+Content-Type: application/json
+
+{
+  "amount": 50.00,
+  "currency": "BRL",
+  "paymentMethod": "PIX",
+  "transactionId": "pix_345678"
+}
+```
+
+### 5. Atualizar Status da Cobrança
+```bash
+PATCH /charges/{chargeId}/status
+Content-Type: application/json
+
+{
+  "status": "PAID"
+}
+```
+
+### 6. Listar Cobranças do Cliente
+```bash
+GET /charges/customer/{customerId}
+```
+
+## 🏗️ Arquitetura
+
+```
+src/
+├── modules/
+│   ├── customers/
+│   │   ├── application/     # Use Cases
+│   │   ├── domain/          # Entidades e Interfaces
+│   │   ├── dto/             # Data Transfer Objects
+│   │   ├── infra/           # Repositórios e Adapters
+│   │   └── customers.controller.ts
+│   └── charges/
+│       ├── application/     # Use Cases
+│       ├── domain/          # Entidades e Interfaces
+│       ├── dto/             # Data Transfer Objects
+│       ├── infra/           # Repositórios e Adapters
+│       └── charges.controller.ts
+└── shared/
+    ├── filters/             # Filtros Globais
+    └── infra/               # Infraestrutura Compartilhada
+```
+
+## 📊 Status dos Pagamentos
+
+| Status | Descrição |
+|--------|-----------|
+| `PENDING` | Cobrança criada, aguardando pagamento |
+| `PAID` | Pagamento confirmado |
+| `FAILED` | Falha no processamento |
+| `EXPIRED` | Cobrança expirada |
+
+## 🔮 Roadmap - Melhorias Futuras
+
+### 🔐 Autenticação e Autorização
+- [ ] JWT Authentication
+- [ ] Role-based Access Control (RBAC)
+- [ ] API Keys para integrações
+
+### 🚀 Performance e Escalabilidade
+- [ ] **Redis** para cache de consultas frequentes
+- [ ] **Paginação** e filtros avançados
+- [ ] **Rate Limiting** por IP/usuário
+- [ ] **Database Indexing** otimizado
+
+### 🔌 Integrações
+- [ ] **Gateway de Pagamento Real**
+  - Stripe
+  - PagSeguro
+  - Mercado Pago
+- [ ] **Webhooks** para notificações
+- [ ] **Filas** (Bull/Redis) para processamento assíncrono
+
+
+### 🛡️ Segurança
+- [ ] **CORS** configurável
+- [ ] **Validação de CPF/CNPJ**
+- [ ] **Criptografia** de dados sensíveis
+
+### 🧪 Qualidade
+- [ ] **Testes de Integração** completos
+
+## 👨‍💻 Autor
+
+**Erick Berdnaski**
+- GitHub: [@berdnaski]https://github.com/berdnaski)
+- LinkedIn: [Erick Berdnaski](https://www.linkedin.com/in/erick-berdnaski/)
+
+---
+
+<p align="center">
+  Feito com ❤️ e ☕ por <a href="https://github.com/berdnaski">Erick Berdnaski</a>
 </p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ npm install
-```
-
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
